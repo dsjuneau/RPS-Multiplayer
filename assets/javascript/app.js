@@ -13,6 +13,21 @@ var database = firebase.database();
 // Variables
 var isMyChat = false;
 
+// This surrounds all the code and will disallow any code from running if two
+// players are already in the game
+database.ref().on(
+  "value",
+  function(snapshot) {
+    // Check to see if the user is already in
+    if (snapshot.child("").exists() && snapshot.child("").exists()) {
+    } else {
+    }
+  },
+  function(errorObject) {
+    console.log("The read failed: " + errorObject.code);
+  }
+);
+
 // Chat function
 $("#chat-btn").click(function(e) {
   e.preventDefault();
