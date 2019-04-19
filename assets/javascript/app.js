@@ -11,32 +11,19 @@ firebase.initializeApp(config);
 var database = firebase.database();
 
 // Variables
-var isMyChat = false;
-
-// This surrounds all the code and will disallow any code from running if two
-// players are already in the game
-database.ref().on(
-  "value",
-  function(snapshot) {
-    // Check to see if the user is already in
-    if (snapshot.child("").exists() && snapshot.child("").exists()) {
-    } else {
-    }
-  },
-  function(errorObject) {
-    console.log("The read failed: " + errorObject.code);
-  }
-);
-
+var isPlayer1 = false;
+var isPlayer2 = false;
+var player;
 // Chat function
-$("#chat-btn").click(function(e) {
+$("#chat-btn").on("click", function(e) {
   e.preventDefault();
   console.log("working");
-
   // Grabbed values from text boxes
-  var message = $("#chat")
-    .val()
-    .trim();
+  var message =
+    player +
+    $("#chat")
+      .val()
+      .trim();
   $("#chat").val("");
   if (message !== "") {
     database.ref().push({
@@ -44,15 +31,50 @@ $("#chat-btn").click(function(e) {
     });
     $("#chat").val("");
   }
-
-  // Code for handling the push
 });
+
+$(".player1").on("click", function(e) {
+  database.ref().push({
+    player1: true
+  });
+  player = "Player One: ";
+  $(".player1").css("display", "none");
+  $(".player2").css("display", "none");
+  $(".option-pick").css("display", "none");
+  $(".hide").css("display", "block");
+  $(".pname").text(player + "pick one...");
+});
+
+$(".player2").on("click", function(e) {
+  database.ref().push({
+    player2: true
+  });
+  player = "Player Two: ";
+  $(".player1").css("display", "none");
+  $(".player2").css("display", "none");
+  $(".option-pick").css("display", "none");
+  $(".hide").css("display", "block");
+  $(".pname").text(player + "pick one...");
+});
+
+// Code for handling the push
 database.ref().on(
   "child_added",
   function(snapshot) {
-    console.log(snapshot.val());
-    var $newChat = $("<p>").text(snapshot.val().message);
-    $(".chat-scroll").prepend($newChat);
+    //Add logic here
+    if (snapshot.val().player1) {
+      isPlayer1 = true;
+      $(".player1").css("display", "none");
+    } else if (snapshot.val().player2) {
+      isPlayer2 = true;
+      $(".player2").css("display", "none");
+    } else {
+      var $newChat = $("<p>").text(snapshot.val().message);
+      $(".chat-scroll").prepend($newChat);
+    }
+    if (isPlayer1 && isPlayer2) {
+      $(".option-pick").text("Game is Full, try again later");
+    }
     // Handle the errors
   },
   function(errorObject) {
