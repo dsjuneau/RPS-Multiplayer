@@ -9,6 +9,10 @@ var config = {
 };
 firebase.initializeApp(config);
 var database = firebase.database();
+database
+  .ref()
+  .onDisconnect()
+  .set(false);
 
 // Variables
 var isPlayer1 = false;
@@ -57,11 +61,14 @@ $(".player2").on("click", function(e) {
   $(".pname").text(player + "pick one...");
 });
 
-// Code for handling the push
+// Code runs through database on load and when a child is added
+// On load, it updates the
 database.ref().on(
   "child_added",
   function(snapshot) {
     //Add logic here
+    console.log(snapshot.val());
+
     if (snapshot.val().player1) {
       isPlayer1 = true;
       $(".player1").css("display", "none");
