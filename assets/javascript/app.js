@@ -23,6 +23,17 @@ var theirHand = "empty";
 
 function playGame(mine, theirs) {
   console.log(mine, theirs);
+  if (mine === theirs) {
+    console.log("Tie");
+  } else if (
+    (mine === "rock" && theirs === "scissors") ||
+    (mine === "paper" && theirs === "rock") ||
+    (mine === "scissors" && theirs === "paper")
+  ) {
+    console.log("You Win");
+  } else {
+    console.log("You Lose");
+  }
 }
 
 // Chat function
@@ -86,6 +97,31 @@ $("#rock").on("click", function() {
   $("#paper").css("display", "none");
   $("#scissors").css("display", "none");
   myHand = "rock";
+  database.ref().push({
+    [mePlayer]: myHand
+  });
+  if (myHand !== "empty" && theirHand !== "empty") {
+    playGame(myHand, theirHand);
+  }
+});
+$("#paper").on("click", function() {
+  $(this).css("background-color", "green");
+  $("#rock").css("display", "none");
+  $("#scissors").css("display", "none");
+  myHand = "paper";
+  database.ref().push({
+    [mePlayer]: myHand
+  });
+  if (myHand !== "empty" && theirHand !== "empty") {
+    playGame(myHand, theirHand);
+  }
+});
+
+$("#scissors").on("click", function() {
+  $(this).css("background-color", "green");
+  $("#paper").css("display", "none");
+  $("#rock").css("display", "none");
+  myHand = "scissors";
   database.ref().push({
     [mePlayer]: myHand
   });
