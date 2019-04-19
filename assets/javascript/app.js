@@ -9,19 +9,25 @@ var config = {
 };
 firebase.initializeApp(config);
 var database = firebase.database();
-database
-  .ref()
-  .onDisconnect()
-  .set(false);
 
 // Variables
 var isPlayer1 = false;
 var isPlayer2 = false;
+var mePlayer;
 var player;
+var opponent;
+var myHand = "empty";
+var theirHand = "empty";
+
+// Game function
+
+function playGame(mine, theirs) {
+  console.log(mine, theirs);
+}
+
 // Chat function
 $("#chat-btn").on("click", function(e) {
   e.preventDefault();
-  console.log("working");
   // Grabbed values from text boxes
   var message =
     player +
@@ -41,7 +47,13 @@ $(".player1").on("click", function(e) {
   database.ref().push({
     player1: true
   });
+  database
+    .ref()
+    .onDisconnect()
+    .set(false);
   player = "Player One: ";
+  mePlayer = "playerOne";
+  opponent = "playerTwo";
   $(".player1").css("display", "none");
   $(".player2").css("display", "none");
   $(".option-pick").css("display", "none");
@@ -53,7 +65,13 @@ $(".player2").on("click", function(e) {
   database.ref().push({
     player2: true
   });
+  database
+    .ref()
+    .onDisconnect()
+    .set(false);
   player = "Player Two: ";
+  mePlayer = "playerTwo";
+  opponent = "playerOne";
   $(".player1").css("display", "none");
   $(".player2").css("display", "none");
   $(".option-pick").css("display", "none");
@@ -61,13 +79,32 @@ $(".player2").on("click", function(e) {
   $(".pname").text(player + "pick one...");
 });
 
+// Manages choice
+
+$("#rock").on("click", function() {
+  $(this).css("background-color", "green");
+  $("#paper").css("display", "none");
+  $("#scissors").css("display", "none");
+  myHand = "rock";
+  database.ref().push({
+    [mePlayer]: myHand
+  });
+  if (myHand !== "empty" && theirHand !== "empty") {
+    playGame(myHand, theirHand);
+  }
+});
+
 // Code runs through database on load and when a child is added
 // On load, it updates the
 database.ref().on(
   "child_added",
   function(snapshot) {
-    //Add logic here
-    console.log(snapshot.val());
+    if (snapshot.val()[opponent] !== undefined) {
+      theirHand = snapshot.val()[opponent];
+      if (myHand !== "empty" && theirHand !== "empty") {
+        playGame(myHand, theirHand);
+      }
+    }
 
     if (snapshot.val().player1) {
       isPlayer1 = true;
