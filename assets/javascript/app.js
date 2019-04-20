@@ -18,22 +18,46 @@ var player;
 var opponent;
 var myHand = "empty";
 var theirHand = "empty";
+var wins = 0,
+  ties = 0,
+  loses = 0;
 
 // Game function
 
+function resetGame() {
+  myHand = "empty";
+  theirHand = "empty";
+  $("#paper")
+    .css("display", "block")
+    .css("background-color", "white");
+  $("#scissors")
+    .css("display", "block")
+    .css("background-color", "white");
+  $("#rock")
+    .css("display", "block")
+    .css("background-color", "white");
+  $("#feedback").text("");
+}
+
 function playGame(mine, theirs) {
-  console.log(mine, theirs);
   if (mine === theirs) {
-    console.log("Tie");
+    ties++;
+    $(".ties").text(ties);
+    $("#feedback").text(myHand + " ties " + theirHand);
   } else if (
     (mine === "rock" && theirs === "scissors") ||
     (mine === "paper" && theirs === "rock") ||
     (mine === "scissors" && theirs === "paper")
   ) {
-    console.log("You Win");
+    wins++;
+    $(".wins").text(wins);
+    $("#feedback").text(myHand + " beats " + theirHand);
   } else {
-    console.log("You Lose");
+    loses++;
+    $(".loses").text(loses);
+    $("#feedback").text(myHand + " loses to " + theirHand);
   }
+  setTimeout(resetGame, 3000);
 }
 
 // Chat function
@@ -61,14 +85,14 @@ $(".player1").on("click", function(e) {
   database
     .ref()
     .onDisconnect()
-    .set(false);
+    .set("Gone");
   player = "Player One: ";
   mePlayer = "playerOne";
   opponent = "playerTwo";
   $(".player1").css("display", "none");
   $(".player2").css("display", "none");
-  $(".option-pick").css("display", "none");
-  $(".hide").css("display", "block");
+  $(".option-pick").text("Wating for Player Two to arrive...");
+
   $(".pname").text(player + "pick one...");
 });
 
@@ -79,14 +103,14 @@ $(".player2").on("click", function(e) {
   database
     .ref()
     .onDisconnect()
-    .set(false);
+    .set("Gone");
   player = "Player Two: ";
   mePlayer = "playerTwo";
   opponent = "playerOne";
   $(".player1").css("display", "none");
   $(".player2").css("display", "none");
-  $(".option-pick").css("display", "none");
-  $(".hide").css("display", "block");
+  $(".option-pick").text("Wating for Player One to arrive...");
+
   $(".pname").text(player + "pick one...");
 });
 
@@ -155,6 +179,11 @@ database.ref().on(
     if (isPlayer1 && isPlayer2) {
       $(".option-pick").text("Game is Full, try again later");
     }
+    if (isPlayer1 && isPlayer2 && player !== "") {
+      $(".hide").css("display", "block");
+      $(".option-pick").css("display", "none");
+    }
+
     // Handle the errors
   },
   function(errorObject) {
